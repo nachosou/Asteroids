@@ -2,18 +2,11 @@
 
 Vector2 posMouse;
 float angle = 0.0f;
-Rectangle rec;
 Vector2 origin;
+
 
 void playerMovement(Player& player, Texture2D playerTexture, int screenWidth, int screenHeight)
 {
-    rec.x = player.pos.x;
-    rec.y = player.pos.y;
-    rec.width = 20;
-    rec.height = 20;
-
-    origin = { rec.width / 2, rec.height / 2 };
-
     posMouse = GetMousePosition();
 
     player.dir = Vector2Normalize(Vector2Subtract(posMouse, player.pos));
@@ -28,24 +21,26 @@ void playerMovement(Player& player, Texture2D playerTexture, int screenWidth, in
         player.velocity.y += player.dir.y * GetFrameTime() * player.aceleration.y;
     }
 
-    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
-    {
-        
-    }
+	if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+	{
+		addBullet(player, Vector2Add(player.pos, player.dir));
+	}
 
     DrawCircle(posMouse.x, posMouse.y, 5, RED);
 
-    drawPlayer(rec, origin, angle, WHITE);
-
-	CheckScreenBoundsCollision(player, screenWidth, screenHeight);
+	screenReflection(player, screenWidth, screenHeight);
 }
 
-void drawPlayer(Rectangle rec, Vector2 origin, float angle, Color color)
+void drawPlayer(Rectangle rec, Player player, Color color)
 {
+	angle = atan2(player.dir.y, player.dir.x) * RAD2DEG + 90.0f;
+
+	origin = { rec.width / 2, rec.height / 2 };
+
     DrawRectanglePro(rec, origin, angle, color);
 }
 
-void CheckScreenBoundsCollision(Player& player, int screenWidth, int screenHeight)
+void screenReflection(Player& player, int screenWidth, int screenHeight)
 {
 	if (player.pos.x + player.velocity.x * GetFrameTime() > screenWidth)
 	{
@@ -106,4 +101,33 @@ void CheckScreenBoundsCollision(Player& player, int screenWidth, int screenHeigh
 	}
 }
 
+void addBullet(Player& player, Vector2 position)
+{
+	for (int i = 0; i < player.maxBullets; i++)
+	{
+		if (player.bulletsArray[i].isActive)
+		{
+			continue;
+		}
+
+		player.bulletsArray[i] = createBullet(position, player.dir);
+		break;
+	}
+}
+
+void checkUpdateBullets(Player& player)
+{
+	for (int i = 0; i < player.maxBullets; i++)
+	{
+		bulletUpdate(player.bulletsArray[i]);
+	}
+}
+
+void checkDrawBullets(Player& player)
+{
+	for (int i = 0; i < player.maxBullets; i++)
+	{
+		bulletDrawing(player.bulletsArray[i]);
+	}
+}
 

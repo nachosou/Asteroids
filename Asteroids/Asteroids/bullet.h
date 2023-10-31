@@ -1,14 +1,18 @@
 #pragma once
 #include "raylib.h"
-#include "player.h"
+#include "raymath.h"
 
 struct Bullets
 {
 	Vector2 pos;
 	Vector2 dir;
-	float rotation;
-	bool active;
-	float coolDown;
-	int speed = 200;
+	int radius = 5;
+	bool isActive{false};
+	int speed = 500;
+	float timeAlive = 2.0f;
+	float currentTime = 0;
 };
 
+bool bulletUpdate(Bullets& bullet);
+void bulletDrawing(Bullets bullet);
+Bullets createBullet(Vector2 position, Vector2 direction);

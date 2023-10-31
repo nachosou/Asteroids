@@ -1,5 +1,4 @@
 #include "raylib.h"
-#include "raymath.h"
 #include "iostream"
 #include "player.h"
 #include "scenes.h"
@@ -15,7 +14,9 @@ void main()
     player.pos.x = screenWidth / 2;
     player.pos.y = screenHeight / 2;
 
-    Bullets bullet;
+    Rectangle rec;
+    rec.width = 20;
+    rec.height = 20;
 
     GameScenes scene = GameScenes::Game;
 
@@ -28,6 +29,9 @@ void main()
 
     while (!WindowShouldClose())
     {
+        rec.x = player.pos.x;
+        rec.y = player.pos.y;
+
         switch (scene)
         {
         case GameScenes::Menu:
@@ -35,7 +39,7 @@ void main()
             break;
 
         case GameScenes::Game:
-            playerMovement(player, playerTexture, screenWidth, screenHeight);
+           /* playerMovement(player, playerTexture, screenWidth, screenHeight);*/
             break;
 
         case GameScenes::Rules:
@@ -77,6 +81,9 @@ void main()
 
         case GameScenes::Game:
             playerMovement(player, playerTexture, screenWidth, screenHeight);
+            checkUpdateBullets(player);
+            drawPlayer(rec, player, WHITE);
+            checkDrawBullets(player);
             break;
 
         case GameScenes::Rules:
