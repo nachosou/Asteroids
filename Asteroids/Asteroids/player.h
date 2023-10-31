@@ -13,9 +13,9 @@ struct Player
 	Bullets bulletsArray[maxBullets];
 };
 
-void playerMovement(Player& player, Texture2D playerTexture, int screenWidth, int screenHeight);
+void playerMovement(Player& player, int screenWidth, int screenHeight);
 
-void drawPlayer(Rectangle rec, Player player, Color color);
+void drawPlayer(Player player, Color color);
 
 void screenReflection(Player& player, int screenWidth, int screenHeight);
 

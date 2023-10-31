@@ -5,7 +5,7 @@ float angle = 0.0f;
 Vector2 origin;
 
 
-void playerMovement(Player& player, Texture2D playerTexture, int screenWidth, int screenHeight)
+void playerMovement(Player& player, int screenWidth, int screenHeight)
 {
     posMouse = GetMousePosition();
 
@@ -31,13 +31,9 @@ void playerMovement(Player& player, Texture2D playerTexture, int screenWidth, in
 	screenReflection(player, screenWidth, screenHeight);
 }
 
-void drawPlayer(Rectangle rec, Player player, Color color)
+void drawPlayer(Player player, Color color)
 {
-	angle = atan2(player.dir.y, player.dir.x) * RAD2DEG + 90.0f;
-
-	origin = { rec.width / 2, rec.height / 2 };
-
-    DrawRectanglePro(rec, origin, angle, color);
+    DrawCircle(player.pos.x, player.pos.y, 15, color);
 }
 
 void screenReflection(Player& player, int screenWidth, int screenHeight)

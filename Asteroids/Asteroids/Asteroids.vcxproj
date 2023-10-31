@@ -87,7 +87,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)lib\raylib;$(SolutionDir)src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)lib\raylib</AdditionalLibraryDirectories>
       <AdditionalDependencies>raylib.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -96,7 +96,7 @@
     <PreBuildEvent>
       <Command>cd "$(OutDir)"
 mkdir "assets"
-xcopy /s /e /y "$(SolutionDir)assets" "$(OutDir)assets"
+xcopy /s /e /y "$(SolutionDir)Asteroids/assets" "$(OutDir)assets"
 </Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
@@ -165,11 +165,13 @@ xcopy /s /e /y "$(SolutionDir)assets" "$(OutDir)assets"
     <ClCompile Include="bullet.cpp" />
     <ClCompile Include="buttons.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="menu.cpp" />
     <ClCompile Include="player.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="asteroids.h" />
     <ClInclude Include="bullet.h" />
+    <ClInclude Include="menu.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="buttons.h" />
     <ClInclude Include="scenes.h" />

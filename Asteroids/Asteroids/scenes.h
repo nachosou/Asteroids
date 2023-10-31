@@ -6,7 +6,6 @@ enum class GameScenes
 	Game,
 	Rules,
 	Exit,
-	History,
 	Win,
 	Lose,
 	Pause
