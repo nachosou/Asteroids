@@ -1,11 +1,15 @@
 #include "menu.h"
 
-void drawMenu(GameScenes& actualScene, int screenWidth, Texture2D playUnselectedButton, Texture2D playSelectedButton, Texture2D rulesUnselectedButton, Texture2D rulesSelectedButton, Texture2D exitUnselectedButton, Texture2D exitSelectedButton)
+void drawMenu(GameScenes& actualScene, int screenWidth, Texture2D playUnselectedButton, Texture2D playSelectedButton, Texture2D rulesUnselectedButton, Texture2D rulesSelectedButton, Texture2D exitUnselectedButton, Texture2D exitSelectedButton, Texture2D background, Texture2D credits)
 {
 	int height = 100;
 	int width = 200;
 
-	int middleButtons = screenWidth / 2 - 50;
+	int middleButtons = screenWidth / 2 - width / 4;
+	int middleCredits = screenWidth / 2 - 200;
+
+	DrawTexture(background, 0, 0, WHITE);
+	DrawTexture(credits, middleCredits, 650, WHITE);
 
 	GameScenes playScene = GameScenes::Game;
 	GameScenes rulesScene = GameScenes::Rules;

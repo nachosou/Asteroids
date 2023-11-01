@@ -9,13 +9,17 @@ struct Player
 	Vector2 dir;
 	Vector2 aceleration = {500, 500};
 	Vector2 velocity = {0, 0};
+	float rotation; 
+	Vector2 origin;
 	static const int maxBullets = 20;
 	Bullets bulletsArray[maxBullets];
+	Rectangle source;
+	Rectangle dest;
 };
 
 void playerMovement(Player& player, int screenWidth, int screenHeight);
 
-void drawPlayer(Player player, Color color);
+void drawPlayer(Player player, Color color, Texture2D playerSpray, Texture2D crosshair);
 
 void screenReflection(Player& player, int screenWidth, int screenHeight);
 

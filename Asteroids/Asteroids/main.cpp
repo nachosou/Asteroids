@@ -16,9 +16,14 @@ Texture2D rulesUnselectedButton;
 Texture2D rulesSelectedButton;
 Texture2D exitUnselectedButton;
 Texture2D exitSelectedButton;
+Texture2D background;
+Texture2D playerSpray;
+Texture2D credits;
+Texture2D harpoon;
+Texture2D crosshair;
 
-void gamePlay(Player& player);
-void drawGamePlay(Player& player);
+void gamePlay(Player& player, GameScenes& actualScene);
+void drawGamePlay(Player& player, Texture2D background);
 
 void main()
 {
@@ -39,6 +44,11 @@ void main()
 
     InitWindow(screenWidth, screenHeight, "ASTEROIDS");
 
+    background = LoadTexture("assets/background.png");
+    playerSpray = LoadTexture("assets/buzo.png");
+    credits = LoadTexture("assets/creditos.png");
+    harpoon = LoadTexture("assets/harpoon.png");
+    crosshair = LoadTexture("assets/mira.png");
     playUnselectedButton = LoadTexture("assets/playUnselectedButton.png");
     playSelectedButton = LoadTexture("assets/playSelectedButton.png");
     rulesUnselectedButton = LoadTexture("assets/rulesUnselectedButton.png");
@@ -63,7 +73,7 @@ void main()
         case GameScenes::Game:
             if (!isGamePaused) 
             {
-                gamePlay(player);
+                gamePlay(player, actualScene);
             }         
             break;
 
@@ -95,11 +105,14 @@ void main()
         switch (actualScene)
         {
         case GameScenes::Menu:
-            drawMenu(actualScene, screenWidth, playUnselectedButton, playSelectedButton, rulesUnselectedButton, rulesSelectedButton, exitUnselectedButton, exitSelectedButton);
+            drawMenu(actualScene, screenWidth, playUnselectedButton, playSelectedButton, rulesUnselectedButton, rulesSelectedButton, exitUnselectedButton, exitSelectedButton, background, credits);
             break;
 
         case GameScenes::Game:
-            drawGamePlay(player);
+            if (!isGamePaused)
+            {
+                drawGamePlay(player, background);
+            }
             break;
 
         case GameScenes::Rules:
@@ -129,19 +142,25 @@ void main()
     CloseWindow();       
 }
 
-void gamePlay(Player& player)
+void gamePlay(Player& player, GameScenes& actualScene)
 {
+    if (IsKeyPressed(KEY_BACKSPACE))
+    {
+        actualScene = GameScenes::Pause;
+    }
+
     playerMovement(player, screenWidth, screenHeight);
     checkUpdateBullets(player);
     updateAsteroidArray();
     asteroidsCreation();
 }
 
-void drawGamePlay(Player& player)
+void drawGamePlay(Player& player, Texture2D background)
 {
     HideCursor();
-    drawPlayer(player, WHITE);
+    DrawTexture(background, 0, 0, WHITE);
     checkDrawBullets(player);
+    drawPlayer(player, WHITE, playerSpray, crosshair);
     drawAsteroidArray();
 }
 

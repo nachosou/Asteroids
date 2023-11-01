@@ -1,5 +1,6 @@
 #pragma once
 #include "raylib.h"
+#include "bullet.h"
 
 static const int asteroidRandomAngle = static_cast<int>(30 * DEG2RAD);
 
