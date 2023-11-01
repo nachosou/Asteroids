@@ -96,8 +96,7 @@
     <PreBuildEvent>
       <Command>cd "$(OutDir)"
 mkdir "assets"
-xcopy /s /e /y "$(SolutionDir)Asteroids/assets" "$(OutDir)assets"
-</Command>
+xcopy /s /e /y "$(SolutionDir)Asteroids/assets" "$(OutDir)assets"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -122,8 +121,7 @@ xcopy /s /e /y "$(SolutionDir)Asteroids/assets" "$(OutDir)assets"
     <PreBuildEvent>
       <Command>cd "$(OutDir)"
 mkdir "assets"
-xcopy /s /e /y "$(SolutionDir)assets" "$(OutDir)assets"
-</Command>
+xcopy /s /e /y "$(SolutionDir)Asteroids/assets" "$(OutDir)assets"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
