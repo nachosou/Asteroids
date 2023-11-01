@@ -62,7 +62,7 @@ void addAsteroid(Vector2 position, asSize SIZE)
 
 	velocity = Vector2Rotate(velocity, speed);
 
-	for (int i = 0; i < maxAsteroids; i++)
+	for (int i = 0; i < 10; i++)
 	{
 		if (asteroidsArray[i].isActive)
 		{

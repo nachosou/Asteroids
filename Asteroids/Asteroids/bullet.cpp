@@ -1,5 +1,7 @@
 #include "bullet.h"
 
+static float bulletAngle = 0.0f;
+
 bool bulletUpdate(Bullets& bullet)
 {
 	if (!bullet.isActive)
@@ -21,11 +23,13 @@ bool bulletUpdate(Bullets& bullet)
 	return true;
 }
 
-void bulletDrawing(Bullets bullet)
+void bulletDrawing(Bullets bullet, Texture2D harpoon)
 {
 	if (bullet.isActive)
 	{
-		DrawCircle(bullet.pos.x, bullet.pos.y, bullet.radius, RED);
+		bulletAngle = atan2(bullet.dir.y, bullet.dir.x) * RAD2DEG;
+
+		DrawTexturePro(harpoon, { 0, 0, static_cast<float>(harpoon.width), static_cast<float>(harpoon.height) }, { bullet.pos.x, bullet.pos.y, static_cast<float>(harpoon.width), static_cast<float>(harpoon.height) }, { static_cast<float>(harpoon.width / 2), static_cast<float>(harpoon.height / 2) }, bulletAngle, WHITE);
 	} 	
 }
 

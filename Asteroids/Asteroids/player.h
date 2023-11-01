@@ -15,6 +15,7 @@ struct Player
 	Bullets bulletsArray[maxBullets];
 	Rectangle source;
 	Rectangle dest;
+	int lifes = 3; 
 };
 
 void playerMovement(Player& player, int screenWidth, int screenHeight);
@@ -27,5 +28,5 @@ void addBullet(Player& player, Vector2 position);
 
 void checkUpdateBullets(Player& player);
 
-void checkDrawBullets(Player& player);
+void checkDrawBullets(Player& player, Texture2D harpoon);
 

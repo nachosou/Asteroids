@@ -5,6 +5,8 @@
 #include "bullet.h"
 #include "menu.h"
 #include "asteroids.h"
+#include "rules.h"
+#include "pause.h"
 
 using namespace std;
 const int screenWidth = 1024;
@@ -16,24 +18,25 @@ Texture2D rulesUnselectedButton;
 Texture2D rulesSelectedButton;
 Texture2D exitUnselectedButton;
 Texture2D exitSelectedButton;
+Texture2D menuUnselectedButton;
+Texture2D menuSelectedButton;
+Texture2D resumeUnselectedButton;
+Texture2D resumeSelectedButton;
 Texture2D background;
 Texture2D playerSpray;
 Texture2D credits;
 Texture2D harpoon;
 Texture2D crosshair;
+Texture2D rulesMenu;
 
 void gamePlay(Player& player, GameScenes& actualScene);
-void drawGamePlay(Player& player, Texture2D background);
+void drawGamePlay(Player& player, Texture2D background, Texture2D harpoon);
 
 void main()
 {
     Player player;
     player.pos.x = screenWidth / 2;
     player.pos.y = screenHeight / 2;
-
-    Rectangle rec;
-    rec.width = 20;
-    rec.height = 20;
 
     GameScenes actualScene = GameScenes::Menu;
     bool newScene = true;
@@ -47,19 +50,23 @@ void main()
     background = LoadTexture("assets/background.png");
     playerSpray = LoadTexture("assets/buzo.png");
     credits = LoadTexture("assets/creditos.png");
-    harpoon = LoadTexture("assets/harpoon.png");
+    harpoon = LoadTexture("assets/arpon.png");
     crosshair = LoadTexture("assets/mira.png");
+    rulesMenu = LoadTexture("assets/rules.png");
     playUnselectedButton = LoadTexture("assets/playUnselectedButton.png");
     playSelectedButton = LoadTexture("assets/playSelectedButton.png");
     rulesUnselectedButton = LoadTexture("assets/rulesUnselectedButton.png");
     rulesSelectedButton = LoadTexture("assets/rulesSelectedButton.png");
     exitUnselectedButton = LoadTexture("assets/exitUnselectedButton.png");
     exitSelectedButton = LoadTexture("assets/exitSelectedButton.png");
+    menuUnselectedButton = LoadTexture("assets/menuUnselectedButton.png");
+    menuSelectedButton = LoadTexture("assets/menuSelectedButton.png");
+    resumeUnselectedButton = LoadTexture("assets/resumeUnselectedButton.png");
+    resumeSelectedButton = LoadTexture("assets/resumeSelectedButton.png");
 
     while (!WindowShouldClose() && !exitProgram)
     {
-        rec.x = player.pos.x;
-        rec.y = player.pos.y;
+        HideCursor();
 
         newScene = actualScene != prevScene;
         prevScene = actualScene;
@@ -67,7 +74,7 @@ void main()
         switch (actualScene)
         {
         case GameScenes::Menu:
-            
+
             break;
 
         case GameScenes::Game:
@@ -78,7 +85,7 @@ void main()
             break;
 
         case GameScenes::Rules:
-
+            
             break;
 
         case GameScenes::Exit:
@@ -105,18 +112,18 @@ void main()
         switch (actualScene)
         {
         case GameScenes::Menu:
-            drawMenu(actualScene, screenWidth, playUnselectedButton, playSelectedButton, rulesUnselectedButton, rulesSelectedButton, exitUnselectedButton, exitSelectedButton, background, credits);
+            drawMenu(actualScene, screenWidth, crosshair, playUnselectedButton, playSelectedButton, rulesUnselectedButton, rulesSelectedButton, exitUnselectedButton, exitSelectedButton, background, credits);
             break;
 
         case GameScenes::Game:
             if (!isGamePaused)
             {
-                drawGamePlay(player, background);
+                drawGamePlay(player, background, harpoon);
             }
             break;
 
         case GameScenes::Rules:
-
+            drawRules(rulesMenu, menuUnselectedButton, menuSelectedButton, actualScene);
             break;
 
         case GameScenes::Exit:
@@ -132,7 +139,7 @@ void main()
             break;
 
         case GameScenes::Pause:
-
+            drawPause(actualScene, crosshair, background, menuUnselectedButton, menuSelectedButton, resumeUnselectedButton, resumeSelectedButton, screenHeight, screenWidth, isGamePaused);
             break;
         }
 
@@ -144,7 +151,7 @@ void main()
 
 void gamePlay(Player& player, GameScenes& actualScene)
 {
-    if (IsKeyPressed(KEY_BACKSPACE))
+    if (IsMouseButtonPressed(2))
     {
         actualScene = GameScenes::Pause;
     }
@@ -155,11 +162,10 @@ void gamePlay(Player& player, GameScenes& actualScene)
     asteroidsCreation();
 }
 
-void drawGamePlay(Player& player, Texture2D background)
+void drawGamePlay(Player& player, Texture2D background, Texture2D harpoon)
 {
-    HideCursor();
     DrawTexture(background, 0, 0, WHITE);
-    checkDrawBullets(player);
+    checkDrawBullets(player, harpoon);
     drawPlayer(player, WHITE, playerSpray, crosshair);
     drawAsteroidArray();
 }

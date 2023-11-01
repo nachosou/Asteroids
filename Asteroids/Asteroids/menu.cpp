@@ -1,7 +1,9 @@
 #include "menu.h"
 
-void drawMenu(GameScenes& actualScene, int screenWidth, Texture2D playUnselectedButton, Texture2D playSelectedButton, Texture2D rulesUnselectedButton, Texture2D rulesSelectedButton, Texture2D exitUnselectedButton, Texture2D exitSelectedButton, Texture2D background, Texture2D credits)
+void drawMenu(GameScenes& actualScene, int screenWidth, Texture2D crosshair, Texture2D playUnselectedButton, Texture2D playSelectedButton, Texture2D rulesUnselectedButton, Texture2D rulesSelectedButton, Texture2D exitUnselectedButton, Texture2D exitSelectedButton, Texture2D background, Texture2D credits)
 {
+	Vector2 posMouse = GetMousePosition();
+
 	int height = 100;
 	int width = 200;
 
@@ -20,4 +22,6 @@ void drawMenu(GameScenes& actualScene, int screenWidth, Texture2D playUnselected
 	buttons(actualScene, rulesScene, middleButtons, 400, width, height, rulesUnselectedButton, rulesSelectedButton);
 
 	buttons(actualScene, exitScene, middleButtons, 500, width, height, exitUnselectedButton, exitSelectedButton);
+
+	DrawTexture(crosshair, posMouse.x, posMouse.y, WHITE);
 }

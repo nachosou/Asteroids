@@ -14,5 +14,5 @@ struct Bullets
 };
 
 bool bulletUpdate(Bullets& bullet);
-void bulletDrawing(Bullets bullet);
+void bulletDrawing(Bullets bullet, Texture2D harpoon);
 Bullets createBullet(Vector2 position, Vector2 direction);

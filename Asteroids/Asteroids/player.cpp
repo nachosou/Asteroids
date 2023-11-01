@@ -1,7 +1,7 @@
 #include "player.h"
 
 Vector2 posMouse;
-float angle = 0.0f;
+float bulletAngle = 0.0f;
 Vector2 origin;
 
 
@@ -13,7 +13,7 @@ void playerMovement(Player& player, int screenWidth, int screenHeight)
 
     player.pos = Vector2Add(player.pos, Vector2Scale(player.velocity, GetFrameTime()));
 
-    angle = atan2(player.dir.y, player.dir.x) * RAD2DEG + 90.0f;
+    bulletAngle = atan2(player.dir.y, player.dir.x) * RAD2DEG + 90.0f;
 
     if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
     {
@@ -31,10 +31,10 @@ void playerMovement(Player& player, int screenWidth, int screenHeight)
 
 void drawPlayer(Player player, Color color, Texture2D playerSpray, Texture2D crosshair)
 {
-	angle = atan2(player.dir.y, player.dir.x) * RAD2DEG;
+	bulletAngle = atan2(player.dir.y, player.dir.x) * RAD2DEG;
 
 	DrawTexture(crosshair, posMouse.x, posMouse.y, WHITE);
-	DrawTexturePro(playerSpray, { 0, 0, static_cast<float>(playerSpray.width), static_cast<float>(playerSpray.height) }, { player.pos.x, player.pos.y, static_cast<float>(playerSpray.width), static_cast<float>(playerSpray.height) }, { static_cast<float>(playerSpray.width / 2), static_cast<float>(playerSpray.height / 2) }, angle, WHITE);
+	DrawTexturePro(playerSpray, { 0, 0, static_cast<float>(playerSpray.width), static_cast<float>(playerSpray.height) }, { player.pos.x, player.pos.y, static_cast<float>(playerSpray.width), static_cast<float>(playerSpray.height) }, { static_cast<float>(playerSpray.width / 2), static_cast<float>(playerSpray.height / 2) }, bulletAngle, WHITE);
 }
 
 void screenReflection(Player& player, int screenWidth, int screenHeight)
@@ -120,11 +120,11 @@ void checkUpdateBullets(Player& player)
 	}
 }
 
-void checkDrawBullets(Player& player)
+void checkDrawBullets(Player& player, Texture2D harpoon)
 {
 	for (int i = 0; i < player.maxBullets; i++)
 	{
-		bulletDrawing(player.bulletsArray[i]);
+		bulletDrawing(player.bulletsArray[i], harpoon);
 	}
 }
 
