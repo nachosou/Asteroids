@@ -16,6 +16,9 @@ struct Player
 	Rectangle source;
 	Rectangle dest;
 	int lifes = 3; 
+	float radius = 15; 
+	bool isActive;
+	int points;
 };
 
 void playerMovement(Player& player, int screenWidth, int screenHeight);

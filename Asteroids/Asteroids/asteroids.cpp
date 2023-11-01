@@ -2,16 +2,22 @@
 #include "raymath.h"
 #include <iostream>
 
-Asteroids createAsteroids(Vector2 position, Vector2 velocity, asSize SIZE)
+Asteroids createAsteroids(Vector2 pos, Vector2 velocity, asSize SIZE)
 {
 	Asteroids asteroid;
 	asteroid.isActive = true;
 	asteroid.SIZE = SIZE;
-	asteroid.position = position;
+	asteroid.pos = pos;
 	asteroid.velocity = velocity;
 	asteroid.rotation = static_cast<float>(rand() % 360);
 	asteroid.rotationSpeed = 70;
 	asteroid.creationTime = static_cast<float>(GetTime());
+	if (asteroid.SIZE & Small)
+		asteroid.radius = 12;
+	else if (asteroid.SIZE & Medium)
+		asteroid.radius = 24;
+	else if (asteroid.SIZE & Big)
+		asteroid.radius = 48;
 	return asteroid;
 }
 
@@ -24,7 +30,7 @@ void asteroidsUpdate(Asteroids& asteroid)
 
 	asteroidsMirroring(asteroid, (GetScreenWidth()), (GetScreenHeight()));
 
-	asteroid.position = Vector2Add(asteroid.position, Vector2Scale(asteroid.velocity, GetFrameTime()));
+	asteroid.pos = Vector2Add(asteroid.pos, Vector2Scale(asteroid.velocity, GetFrameTime()));
 	asteroid.rotation += asteroid.rotationSpeed * GetFrameTime();
 }
 
@@ -35,37 +41,45 @@ void asteroidDraw(Asteroids asteroid)
 		return;
 	}
 
-	float asteroidRadius = 0;
-
-	if (asteroid.SIZE & Small)
-		asteroidRadius = 12;
-	else if (asteroid.SIZE & Medium)
-		asteroidRadius = 24;
-	else if (asteroid.SIZE & Big)
-		asteroidRadius = 48;
-
-	DrawCircleLines((asteroid.position.x), (asteroid.position.y), asteroidRadius, WHITE);
+	DrawCircleLines((asteroid.pos.x), (asteroid.pos.y), asteroid.radius, WHITE);
 }
 
-void addAsteroid(Vector2 position, asSize SIZE)
+void addAsteroid(Vector2 pos, asSize SIZE, Vector2 secondAsteroidVelocity, bool isSpawned)
 {
 	Vector2 screenCenter = { (GetScreenHeight() / 2),  (GetScreenWidth() / 2) };
 
-	Vector2 velocity = Vector2Subtract(screenCenter, position);
-	velocity = Vector2Scale(Vector2Normalize(velocity), (speed));
+	Vector2 firstAsteroidVelocity = Vector2Subtract(screenCenter, pos);
+	firstAsteroidVelocity = Vector2Scale(Vector2Normalize(firstAsteroidVelocity), (speed));
 
-	velocity = Vector2Rotate(velocity, speed);
+	firstAsteroidVelocity = Vector2Rotate(firstAsteroidVelocity, speed);
 
-	for (int i = 0; i < 10; i++)
+	if (isSpawned) 
 	{
-		if (asteroidsArray[i].isActive)
+		for (int i = 0; i < maxAsteroids; i++)
 		{
-			continue;
-		}
+			if (asteroidsArray[i].isActive)
+			{
+				continue;
+			}
 
-		asteroidsArray[i] = createAsteroids(position, velocity, SIZE);
-		asteroidCounter++;
-		break;
+			asteroidsArray[i] = createAsteroids(pos, firstAsteroidVelocity, SIZE);
+			asteroidCounter++;
+			break;
+		}
+	}
+	else
+	{
+		for (int i = 0; i < maxAsteroids; i++)
+		{
+			if (asteroidsArray[i].isActive)
+			{
+				continue;
+			}
+
+			asteroidsArray[i] = createAsteroids(pos, secondAsteroidVelocity, SIZE);
+			asteroidCounter++;
+			break;
+		}
 	}
 }
 
@@ -74,7 +88,7 @@ void asteroidsCreation()
 	if (GetTime() > lastAsteroidCreationTime + asteroidCoolDown && asteroidCounter < maxAsteroids / 4)
 	{
 		asSize nextSize = asteroidSizes[GetRandomValue(0, 2)];
-		addAsteroid(nextAsteroidPosition(), nextSize);
+		addAsteroid(nextAsteroidPosition(), nextSize, { 0, 0 }, true);
 		lastAsteroidCreationTime = (GetTime());
 	}
 }
@@ -122,63 +136,153 @@ void drawAsteroidArray()
 	}
 }
 
-void asteroidsMirroring(Asteroids& asteroid, float screenWidth, float screenHeight)
+bool cirCirCollision(float circle1x, float circle1y, float circle1r, float circle2x, float circle2y, float circle2r)
 {
-	if (asteroid.position.x + asteroid.velocity.x * GetFrameTime() > screenWidth)
+	float distX = circle1x - circle2x;
+	float distY = circle1y - circle2y;
+	float distance = static_cast<float>(sqrt((distX * distX) + (distY * distY)));
+
+	if (distance <= circle1r + circle2r)
 	{
-		asteroid.position.x = 0;
-		if (asteroid.velocity.y > 0)
-		{
-			if (asteroid.position.y > screenHeight / 2)
-				asteroid.position.y = screenHeight - asteroid.position.y;
-		}
-		else if (asteroid.velocity.y < 0)
-		{
-			if (asteroid.position.y < screenHeight / 2)
-				asteroid.position.y = screenHeight - asteroid.position.y;
-		}
+		return true;
 	}
-	else if (asteroid.position.x + asteroid.velocity.x * GetFrameTime() < 0)
+
+	return false;
+}
+
+void checkGameCollisions(Player& player)
+{
+	bulletAsteroidCollision(player);
+	asteroidPlayerCollision(player);
+}
+
+void asteroidPlayerCollision(Player& player)
+{
+	for (int i = 0; i < maxAsteroids; i++)
 	{
-		asteroid.position.x = screenWidth;
-		if (asteroid.velocity.y > 0)
+		if (!asteroidsArray[i].isActive) continue;
+
+		if (cirCirCollision(player.pos.x, player.pos.y, player.radius, asteroidsArray[i].pos.x, asteroidsArray[i].pos.y, asteroidsArray[i].radius))
 		{
-			if (asteroid.position.y > screenHeight / 2)
-				asteroid.position.y = screenHeight - asteroid.position.y;
-		}
-		else if (asteroid.velocity.y < 0)
-		{
-			if (asteroid.position.y < screenHeight / 2)
-				asteroid.position.y = screenHeight - asteroid.position.y;
+			player.lifes--;
 		}
 	}
 
-	if (asteroid.position.y + asteroid.velocity.y * GetFrameTime() > screenHeight)
+	if (player.lifes <= 0)
 	{
-		asteroid.position.y = 0;
-		if (asteroid.velocity.x > 0)
+		player.isActive = false;
+	}
+}
+
+void asteroidDivider(Asteroids& asteroid, Player& player)
+{
+	Vector2 screenCenter = { (GetScreenHeight() / 2),  (GetScreenWidth() / 2) };
+
+	Vector2 newFirstAsteroidVelocity = Vector2Subtract(screenCenter, asteroid.pos);
+	Vector2 newSecondAsteroidVelocity = Vector2Subtract(screenCenter, asteroid.pos);
+	newFirstAsteroidVelocity = Vector2Scale(Vector2Normalize(newFirstAsteroidVelocity), (speed));
+	newSecondAsteroidVelocity = Vector2Scale(Vector2Normalize(newFirstAsteroidVelocity), (speed));
+
+	newFirstAsteroidVelocity = Vector2Rotate(newFirstAsteroidVelocity, speed);
+	newSecondAsteroidVelocity = Vector2Rotate(newFirstAsteroidVelocity, speed);
+
+	asteroid.isActive = false;
+	asteroidCounter--;
+	player.points += 10;
+
+	switch (asteroid.SIZE)
+	{
+	case Big:
+		addAsteroid(asteroid.pos, Medium, newFirstAsteroidVelocity, false);
+		addAsteroid(asteroid.pos, Medium, newSecondAsteroidVelocity, false);
+		break;
+
+	case Medium:
+		addAsteroid(asteroid.pos, Small, newFirstAsteroidVelocity, false);
+		addAsteroid(asteroid.pos, Small, newSecondAsteroidVelocity, false);
+		break;
+
+	case Small:
+		asteroid.isActive = false;
+		asteroidCounter--;
+		break;
+	}
+}
+
+void bulletAsteroidCollision(Player& player)
+{
+	for (int i = 0; i < maxAsteroids; i++)
+	{
+		for (int j = 0; j < player.maxBullets; j++)
 		{
-			if (asteroid.position.x > screenWidth / 2)
-				asteroid.position.x = screenWidth - asteroid.position.x;
-		}
-		else if (asteroid.velocity.x < 0)
-		{
-			if (asteroid.position.x < screenWidth / 2)
-				asteroid.position.x = screenWidth - asteroid.position.x;
+			if (!asteroidsArray[i].isActive || !player.bulletsArray[j].isActive) continue;
+
+			if (cirCirCollision(player.bulletsArray[j].pos.x, player.bulletsArray[j].pos.y, player.bulletsArray[j].radius, asteroidsArray[i].pos.x, asteroidsArray[i].pos.y, asteroidsArray[i].radius))
+			{
+				asteroidDivider(asteroidsArray[i], player);
+				player.bulletsArray[j].isActive = false;
+			}
 		}
 	}
-	else if (asteroid.position.y + asteroid.velocity.y * GetFrameTime() < 0)
+}
+
+void asteroidsMirroring(Asteroids& asteroid, float screenWidth, float screenHeight)
+{
+	if (asteroid.pos.x + asteroid.velocity.x * GetFrameTime() > screenWidth)
 	{
-		asteroid.position.y = screenHeight;
+		asteroid.pos.x = 0;
+		if (asteroid.velocity.y > 0)
+		{
+			if (asteroid.pos.y > screenHeight / 2)
+				asteroid.pos.y = screenHeight - asteroid.pos.y;
+		}
+		else if (asteroid.velocity.y < 0)
+		{
+			if (asteroid.pos.y < screenHeight / 2)
+				asteroid.pos.y = screenHeight - asteroid.pos.y;
+		}
+	}
+	else if (asteroid.pos.x + asteroid.velocity.x * GetFrameTime() < 0)
+	{
+		asteroid.pos.x = screenWidth;
+		if (asteroid.velocity.y > 0)
+		{
+			if (asteroid.pos.y > screenHeight / 2)
+				asteroid.pos.y = screenHeight - asteroid.pos.y;
+		}
+		else if (asteroid.velocity.y < 0)
+		{
+			if (asteroid.pos.y < screenHeight / 2)
+				asteroid.pos.y = screenHeight - asteroid.pos.y;
+		}
+	}
+
+	if (asteroid.pos.y + asteroid.velocity.y * GetFrameTime() > screenHeight)
+	{
+		asteroid.pos.y = 0;
 		if (asteroid.velocity.x > 0)
 		{
-			if (asteroid.position.x > screenWidth / 2)
-				asteroid.position.x = screenWidth - asteroid.position.x;
+			if (asteroid.pos.x > screenWidth / 2)
+				asteroid.pos.x = screenWidth - asteroid.pos.x;
 		}
 		else if (asteroid.velocity.x < 0)
 		{
-			if (asteroid.position.x < screenWidth / 2)
-				asteroid.position.x = screenWidth - asteroid.position.x;
+			if (asteroid.pos.x < screenWidth / 2)
+				asteroid.pos.x = screenWidth - asteroid.pos.x;
+		}
+	}
+	else if (asteroid.pos.y + asteroid.velocity.y * GetFrameTime() < 0)
+	{
+		asteroid.pos.y = screenHeight;
+		if (asteroid.velocity.x > 0)
+		{
+			if (asteroid.pos.x > screenWidth / 2)
+				asteroid.pos.x = screenWidth - asteroid.pos.x;
+		}
+		else if (asteroid.velocity.x < 0)
+		{
+			if (asteroid.pos.x < screenWidth / 2)
+				asteroid.pos.x = screenWidth - asteroid.pos.x;
 		}
 	}
 }

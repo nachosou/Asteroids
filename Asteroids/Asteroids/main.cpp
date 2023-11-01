@@ -29,6 +29,8 @@ Texture2D harpoon;
 Texture2D crosshair;
 Texture2D rulesMenu;
 Texture2D logo;
+Texture2D win;
+Texture2D lose;
 
 void gamePlay(Player& player, GameScenes& actualScene);
 void drawGamePlay(Player& player, Texture2D background, Texture2D harpoon);
@@ -56,6 +58,8 @@ void main()
     crosshair = LoadTexture("assets/mira.png");
     rulesMenu = LoadTexture("assets/rules.png");
     logo = LoadTexture("assets/logo.png");
+    win = LoadTexture("assets/win.png");
+    lose = LoadTexture("assets/lose.png");
     playUnselectedButton = LoadTexture("assets/playUnselectedButton.png");
     playSelectedButton = LoadTexture("assets/playSelectedButton.png");
     rulesUnselectedButton = LoadTexture("assets/rulesUnselectedButton.png");
@@ -126,7 +130,7 @@ void main()
             break;
 
         case GameScenes::Rules:
-            drawRules(rulesMenu, menuUnselectedButton, menuSelectedButton, actualScene);
+            drawRules(rulesMenu, menuUnselectedButton, menuSelectedButton, actualScene, crosshair);
             break;
 
         case GameScenes::Exit:
@@ -163,6 +167,7 @@ void gamePlay(Player& player, GameScenes& actualScene)
     checkUpdateBullets(player);
     updateAsteroidArray();
     asteroidsCreation();
+    checkGameCollisions(player);
 }
 
 void drawGamePlay(Player& player, Texture2D background, Texture2D harpoon)
@@ -171,6 +176,7 @@ void drawGamePlay(Player& player, Texture2D background, Texture2D harpoon)
     checkDrawBullets(player, harpoon);
     drawPlayer(player, WHITE, playerSpray, crosshair);
     drawAsteroidArray();
+    checkGameCollisions(player);
 }
 
 void resetStats(Player& player, Asteroids asteroidsArray[])
