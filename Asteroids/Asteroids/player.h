@@ -19,6 +19,7 @@ struct Player
 	float radius = 15; 
 	bool isActive;
 	int points;
+	float invulnerabilityTime = 1.2f;
 };
 
 void playerMovement(Player& player, int screenWidth, int screenHeight);

@@ -7,6 +7,8 @@
 #include "asteroids.h"
 #include "rules.h"
 #include "pause.h"
+#include "lose.h"
+#include "win.h"
 
 using namespace std;
 const int screenWidth = 1024;
@@ -31,16 +33,26 @@ Texture2D rulesMenu;
 Texture2D logo;
 Texture2D win;
 Texture2D lose;
+Texture2D bigEnemy;
+Texture2D mediumEnemy;
+Texture2D smallEnemy;
 
-void gamePlay(Player& player, GameScenes& actualScene);
+void gamePlay(Player& player, GameScenes& actualScene, float gameTimer);
 void drawGamePlay(Player& player, Texture2D background, Texture2D harpoon);
-void resetStats(Player& player, Asteroids asteroidsArray[]);
+void resetStats(Player& player, float& gameTimer);
+void winOrLose(GameScenes& actualScene, Player& player, float gameTimer);
+
+static Asteroids asteroidsArray[maxAsteroids];
 
 void main()
 {
     Player player;
     player.pos.x = screenWidth / 2;
     player.pos.y = screenHeight / 2;
+
+    float gameTimer = 0.0f;
+
+    int resetCounter = 0;
 
     GameScenes actualScene = GameScenes::Menu;
     bool newScene = true;
@@ -60,6 +72,9 @@ void main()
     logo = LoadTexture("assets/logo.png");
     win = LoadTexture("assets/win.png");
     lose = LoadTexture("assets/lose.png");
+    bigEnemy = LoadTexture("assets/bigEnemy.png");
+    mediumEnemy = LoadTexture("assets/mediumEnemy.png");
+    smallEnemy = LoadTexture("assets/smallEnemy.png");
     playUnselectedButton = LoadTexture("assets/playUnselectedButton.png");
     playSelectedButton = LoadTexture("assets/playSelectedButton.png");
     rulesUnselectedButton = LoadTexture("assets/rulesUnselectedButton.png");
@@ -71,6 +86,14 @@ void main()
     resumeUnselectedButton = LoadTexture("assets/resumeUnselectedButton.png");
     resumeSelectedButton = LoadTexture("assets/resumeSelectedButton.png");
 
+    if (resetCounter < 1)
+    {
+        if (actualScene == GameScenes::Game)
+        {
+            resetCounter++;
+        }
+    }
+    
     while (!WindowShouldClose() && !exitProgram)
     {
         HideCursor();
@@ -81,13 +104,22 @@ void main()
         switch (actualScene)
         {
         case GameScenes::Menu:
-            resetStats(player, asteroidsArray);
+        case GameScenes::Win:
+        case GameScenes::Lose:
+            resetStats(player, gameTimer);
             break;
 
         case GameScenes::Game:
             if (!isGamePaused) 
             {
-                gamePlay(player, actualScene);
+                if (resetCounter >= 1)
+                {
+                    asteroidsArray[0].isActive = true;
+                    resetCounter = 0;
+                }
+
+                gameTimer += GetFrameTime();
+                gamePlay(player, actualScene, gameTimer);
             }         
             break;
 
@@ -97,14 +129,6 @@ void main()
 
         case GameScenes::Exit:
             exitProgram = true;
-            break;
-
-        case GameScenes::Win:
-
-            break;
-
-        case GameScenes::Lose:
-
             break;
 
         case GameScenes::Pause:
@@ -134,15 +158,15 @@ void main()
             break;
 
         case GameScenes::Exit:
-
+            exitProgram = true;
             break;
 
         case GameScenes::Win:
-
+            drawWinScreen(actualScene, crosshair, win, menuUnselectedButton, menuSelectedButton, playUnselectedButton, playSelectedButton);
             break;
 
         case GameScenes::Lose:
-
+            drawLoseScreen(actualScene, crosshair, lose, menuUnselectedButton, menuSelectedButton, playUnselectedButton, playSelectedButton);
             break;
 
         case GameScenes::Pause:
@@ -156,7 +180,7 @@ void main()
     CloseWindow();       
 }
 
-void gamePlay(Player& player, GameScenes& actualScene)
+void gamePlay(Player& player, GameScenes& actualScene, float gameTimer)
 {
     if (IsMouseButtonPressed(2))
     {
@@ -165,9 +189,10 @@ void gamePlay(Player& player, GameScenes& actualScene)
 
     playerMovement(player, screenWidth, screenHeight);
     checkUpdateBullets(player);
-    updateAsteroidArray();
-    asteroidsCreation();
-    checkGameCollisions(player);
+    updateAsteroidArray(asteroidsArray);
+    asteroidsCreation(asteroidsArray, smallEnemy, mediumEnemy, bigEnemy);
+    checkGameCollisions(player, asteroidsArray, smallEnemy, mediumEnemy, bigEnemy);
+    winOrLose(actualScene, player, gameTimer);
 }
 
 void drawGamePlay(Player& player, Texture2D background, Texture2D harpoon)
@@ -175,19 +200,41 @@ void drawGamePlay(Player& player, Texture2D background, Texture2D harpoon)
     DrawTexture(background, 0, 0, WHITE);
     checkDrawBullets(player, harpoon);
     drawPlayer(player, WHITE, playerSpray, crosshair);
-    drawAsteroidArray();
-    checkGameCollisions(player);
+    drawAsteroidArray(asteroidsArray);
+    checkGameCollisions(player, asteroidsArray, smallEnemy, mediumEnemy, bigEnemy);
 }
 
-void resetStats(Player& player, Asteroids asteroidsArray[])
+void resetStats(Player& player, float& gameTimer)
 {
     player.pos.x = screenWidth / 2;
     player.pos.y = screenHeight / 2;
     player.velocity = { 0, 0 };
+    player.lifes = 3;
 
     for (int i = 0; i < player.maxBullets; i++)
     {
         player.bulletsArray[i].isActive = false;
     }
+
+    for (int i = 0; i < maxAsteroids; i++)
+    {
+        asteroidsArray[i].isActive = false;
+    }
+
+    gameTimer = 0.0f;
 }
+
+void winOrLose(GameScenes& actualScene, Player& player, float gameTimer)
+{
+    if (player.lifes <= 0)
+    {
+        actualScene = GameScenes::Lose;
+    }
+
+    if (gameTimer >= 150 && player.lifes > 0)
+    {
+        actualScene = GameScenes::Win;
+    }
+}
+
 

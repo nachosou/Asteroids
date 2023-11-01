@@ -39,6 +39,12 @@
     <ClCompile Include="pause.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
+    <ClCompile Include="lose.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="win.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="player.h">
@@ -63,6 +69,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="pause.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lose.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="win.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

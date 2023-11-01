@@ -1,0 +1,16 @@
+#include "lose.h"
+
+void drawLoseScreen(GameScenes& actualScene, Texture2D crosshair, Texture2D lose, Texture2D menuUnselectedButton, Texture2D menuSelectedButton, Texture2D playUnselectedButton, Texture2D playSelectedButton)
+{
+	Vector2 posMouse = GetMousePosition();
+
+	DrawTexture(lose, 0, 0, WHITE);
+
+	GameScenes menu = GameScenes::Menu;
+	GameScenes play = GameScenes::Game;
+
+	buttons(actualScene, menu, 849, 618, 200, 100, menuUnselectedButton, menuSelectedButton);
+	buttons(actualScene, play, 699, 618, 200, 100, playUnselectedButton, playSelectedButton);
+
+	DrawTexture(crosshair, posMouse.x, posMouse.y, WHITE);
+}

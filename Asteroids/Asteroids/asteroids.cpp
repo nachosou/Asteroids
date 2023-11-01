@@ -2,22 +2,30 @@
 #include "raymath.h"
 #include <iostream>
 
-Asteroids createAsteroids(Vector2 pos, Vector2 velocity, asSize SIZE)
+Asteroids createAsteroids(Vector2 pos, Vector2 velocity, asSize SIZE, Texture2D smallEnemy, Texture2D mediumEnemy, Texture2D bigEnemy)
 {
 	Asteroids asteroid;
 	asteroid.isActive = true;
 	asteroid.SIZE = SIZE;
 	asteroid.pos = pos;
 	asteroid.velocity = velocity;
-	asteroid.rotation = static_cast<float>(rand() % 360);
-	asteroid.rotationSpeed = 70;
 	asteroid.creationTime = static_cast<float>(GetTime());
 	if (asteroid.SIZE & Small)
+	{
 		asteroid.radius = 12;
+		asteroid.texture = smallEnemy;
+	}
 	else if (asteroid.SIZE & Medium)
+	{
 		asteroid.radius = 24;
+		asteroid.texture = mediumEnemy;
+	}
 	else if (asteroid.SIZE & Big)
+	{
 		asteroid.radius = 48;
+		asteroid.texture = bigEnemy;
+	}
+		
 	return asteroid;
 }
 
@@ -31,7 +39,6 @@ void asteroidsUpdate(Asteroids& asteroid)
 	asteroidsMirroring(asteroid, (GetScreenWidth()), (GetScreenHeight()));
 
 	asteroid.pos = Vector2Add(asteroid.pos, Vector2Scale(asteroid.velocity, GetFrameTime()));
-	asteroid.rotation += asteroid.rotationSpeed * GetFrameTime();
 }
 
 void asteroidDraw(Asteroids asteroid)
@@ -41,10 +48,10 @@ void asteroidDraw(Asteroids asteroid)
 		return;
 	}
 
-	DrawCircleLines((asteroid.pos.x), (asteroid.pos.y), asteroid.radius, WHITE);
+	DrawTexture(asteroid.texture, asteroid.pos.x - asteroid.radius, asteroid.pos.y - asteroid.radius, WHITE);
 }
 
-void addAsteroid(Vector2 pos, asSize SIZE, Vector2 secondAsteroidVelocity, bool isSpawned)
+void addAsteroid(Vector2 pos, asSize SIZE, Vector2 secondAsteroidVelocity, bool isSpawned, Asteroids asteroidsArray[], Texture2D smallEnemy, Texture2D mediumEnemy, Texture2D bigEnemy)
 {
 	Vector2 screenCenter = { (GetScreenHeight() / 2),  (GetScreenWidth() / 2) };
 
@@ -62,7 +69,7 @@ void addAsteroid(Vector2 pos, asSize SIZE, Vector2 secondAsteroidVelocity, bool 
 				continue;
 			}
 
-			asteroidsArray[i] = createAsteroids(pos, firstAsteroidVelocity, SIZE);
+			asteroidsArray[i] = createAsteroids(pos, firstAsteroidVelocity, SIZE, smallEnemy, mediumEnemy, bigEnemy);
 			asteroidCounter++;
 			break;
 		}
@@ -76,19 +83,19 @@ void addAsteroid(Vector2 pos, asSize SIZE, Vector2 secondAsteroidVelocity, bool 
 				continue;
 			}
 
-			asteroidsArray[i] = createAsteroids(pos, secondAsteroidVelocity, SIZE);
+			asteroidsArray[i] = createAsteroids(pos, secondAsteroidVelocity, SIZE, smallEnemy, mediumEnemy, bigEnemy);
 			asteroidCounter++;
 			break;
 		}
 	}
 }
 
-void asteroidsCreation()
+void asteroidsCreation(Asteroids asteroidsArray[], Texture2D smallEnemy, Texture2D mediumEnemy, Texture2D bigEnemy)
 {
 	if (GetTime() > lastAsteroidCreationTime + asteroidCoolDown && asteroidCounter < maxAsteroids / 4)
 	{
 		asSize nextSize = asteroidSizes[GetRandomValue(0, 2)];
-		addAsteroid(nextAsteroidPosition(), nextSize, { 0, 0 }, true);
+		addAsteroid(nextAsteroidPosition(), nextSize, { 0, 0 }, true, asteroidsArray, smallEnemy, mediumEnemy, bigEnemy);
 		lastAsteroidCreationTime = (GetTime());
 	}
 }
@@ -120,7 +127,7 @@ Vector2 nextAsteroidPosition()
 	return pos;
 }
 
-void updateAsteroidArray()
+void updateAsteroidArray(Asteroids asteroidsArray[])
 {
 	for (int i = 0; i < maxAsteroids; i++)
 	{
@@ -128,7 +135,7 @@ void updateAsteroidArray()
 	}
 }
 
-void drawAsteroidArray()
+void drawAsteroidArray(Asteroids asteroidsArray[])
 {
 	for (int i = 0; i < maxAsteroids; i++)
 	{
@@ -150,13 +157,13 @@ bool cirCirCollision(float circle1x, float circle1y, float circle1r, float circl
 	return false;
 }
 
-void checkGameCollisions(Player& player)
+void checkGameCollisions(Player& player, Asteroids asteroidsArray[], Texture2D smallEnemy, Texture2D mediumEnemy, Texture2D bigEnemy)
 {
-	bulletAsteroidCollision(player);
-	asteroidPlayerCollision(player);
+	bulletAsteroidCollision(player, asteroidsArray, smallEnemy, mediumEnemy, bigEnemy);
+	asteroidPlayerCollision(player, asteroidsArray);
 }
 
-void asteroidPlayerCollision(Player& player)
+void asteroidPlayerCollision(Player& player, Asteroids asteroidsArray[])
 {
 	for (int i = 0; i < maxAsteroids; i++)
 	{
@@ -174,7 +181,7 @@ void asteroidPlayerCollision(Player& player)
 	}
 }
 
-void asteroidDivider(Asteroids& asteroid, Player& player)
+void asteroidDivider(Asteroids& asteroid, Player& player, Asteroids asteroidsArray[], Texture2D smallEnemy, Texture2D mediumEnemy, Texture2D bigEnemy)
 {
 	Vector2 screenCenter = { (GetScreenHeight() / 2),  (GetScreenWidth() / 2) };
 
@@ -193,13 +200,13 @@ void asteroidDivider(Asteroids& asteroid, Player& player)
 	switch (asteroid.SIZE)
 	{
 	case Big:
-		addAsteroid(asteroid.pos, Medium, newFirstAsteroidVelocity, false);
-		addAsteroid(asteroid.pos, Medium, newSecondAsteroidVelocity, false);
+		addAsteroid(asteroid.pos, Medium, newFirstAsteroidVelocity, false, asteroidsArray, smallEnemy, mediumEnemy, bigEnemy);
+		addAsteroid(asteroid.pos, Medium, newSecondAsteroidVelocity, false, asteroidsArray, smallEnemy, mediumEnemy, bigEnemy);
 		break;
 
 	case Medium:
-		addAsteroid(asteroid.pos, Small, newFirstAsteroidVelocity, false);
-		addAsteroid(asteroid.pos, Small, newSecondAsteroidVelocity, false);
+		addAsteroid(asteroid.pos, Small, newFirstAsteroidVelocity, false, asteroidsArray, smallEnemy, mediumEnemy, bigEnemy);
+		addAsteroid(asteroid.pos, Small, newSecondAsteroidVelocity, false, asteroidsArray, smallEnemy, mediumEnemy, bigEnemy);
 		break;
 
 	case Small:
@@ -209,7 +216,7 @@ void asteroidDivider(Asteroids& asteroid, Player& player)
 	}
 }
 
-void bulletAsteroidCollision(Player& player)
+void bulletAsteroidCollision(Player& player, Asteroids asteroidsArray[], Texture2D smallEnemy, Texture2D mediumEnemy, Texture2D bigEnemy)
 {
 	for (int i = 0; i < maxAsteroids; i++)
 	{
@@ -219,7 +226,7 @@ void bulletAsteroidCollision(Player& player)
 
 			if (cirCirCollision(player.bulletsArray[j].pos.x, player.bulletsArray[j].pos.y, player.bulletsArray[j].radius, asteroidsArray[i].pos.x, asteroidsArray[i].pos.y, asteroidsArray[i].radius))
 			{
-				asteroidDivider(asteroidsArray[i], player);
+				asteroidDivider(asteroidsArray[i], player, asteroidsArray, smallEnemy, mediumEnemy, bigEnemy);
 				player.bulletsArray[j].isActive = false;
 			}
 		}

@@ -8,7 +8,7 @@ static const int asteroidRandomAngle = static_cast<int>(30 * DEG2RAD);
 static const int asteroidCoolDown = 1.0f;
 static int lastAsteroidCreationTime = -1.0f;
 
-static const int maxAsteroids = 40;
+static const int maxAsteroids = 24;
 static const int speed = 110;
 static int asteroidCounter = 0;
 
@@ -24,28 +24,26 @@ struct Asteroids
 	bool isActive;
 	asSize SIZE;
 	Vector2 pos;
-	float rotation;
-	float rotationSpeed;
 	float creationTime;
 	Vector2 velocity;
 	float radius;
+	bool isSpawned;
+	Texture2D texture;
 };
 
-
-Asteroids static asteroidsArray[maxAsteroids] = { 0 };
 static asSize asteroidSizes[] = { Small, Medium, Big };
 
-Asteroids createAsteroids(Vector2 pos, Vector2 velocity, asSize SIZE);
+Asteroids createAsteroids(Vector2 pos, Vector2 velocity, asSize SIZE, Texture2D smallEnemy, Texture2D mediumEnemy, Texture2D bigEnemy);
 void asteroidsUpdate(Asteroids& asteroid);
 void asteroidDraw(Asteroids asteroid);
-void addAsteroid(Vector2 pos, asSize SIZE, Vector2 secondAsteroidVelocity, bool isSpawned);
-void asteroidsCreation();
+void addAsteroid(Vector2 pos, asSize SIZE, Vector2 secondAsteroidVelocity, bool isSpawne, Texture2D smallEnemy, Texture2D mediumEnemy, Texture2D bigEnemyd);
+void asteroidsCreation(Asteroids asteroidsArray[], Texture2D smallEnemy, Texture2D mediumEnemy, Texture2D bigEnemy);
 Vector2 nextAsteroidPosition();
-void updateAsteroidArray();
-void drawAsteroidArray();
+void updateAsteroidArray(Asteroids asteroidsArray[]);
+void drawAsteroidArray(Asteroids asteroidsArray[]);
 bool cirCirCollision(float circle1x, float circle1y, float circle1r, float circle2x, float circle2y, float circle2r);
-void checkGameCollisions(Player& player);
-void asteroidPlayerCollision(Player& player);
-void asteroidDivider(Asteroids& asteroid, Player& player);
-void bulletAsteroidCollision(Player& player);
+void checkGameCollisions(Player& player, Asteroids asteroidsArray[], Texture2D smallEnemy, Texture2D mediumEnemy, Texture2D bigEnemy);
+void asteroidPlayerCollision(Player& player, Asteroids asteroidsArray[]);
+void asteroidDivider(Asteroids& asteroid, Player& player, Asteroids asteroidsArray[], Texture2D smallEnemy, Texture2D mediumEnemy, Texture2D bigEnemy);
+void bulletAsteroidCollision(Player& player, Asteroids asteroidsArray[], Texture2D smallEnemy, Texture2D mediumEnemy, Texture2D bigEnemy);
 void asteroidsMirroring(Asteroids& asteroid, float screenWidth, float screenHeight);
