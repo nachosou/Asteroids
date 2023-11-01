@@ -2,12 +2,6 @@
 #include "raymath.h"
 #include <iostream>
 
-static const int maxAsteroids = 15;
-static const int speed = 110;
-
-Asteroids static asteroidsArray[maxAsteroids] = { 0 };
-asSize asteroidSizes[] = { Small, Medium, Big };
-
 Asteroids createAsteroids(Vector2 position, Vector2 velocity, asSize SIZE)
 {
 	Asteroids asteroid;
@@ -70,13 +64,14 @@ void addAsteroid(Vector2 position, asSize SIZE)
 		}
 
 		asteroidsArray[i] = createAsteroids(position, velocity, SIZE);
+		asteroidCounter++;
 		break;
 	}
 }
 
 void asteroidsCreation()
 {
-	if (GetTime() > lastAsteroidCreationTime + asteroidCoolDown)
+	if (GetTime() > lastAsteroidCreationTime + asteroidCoolDown && asteroidCounter < maxAsteroids / 4)
 	{
 		asSize nextSize = asteroidSizes[GetRandomValue(0, 2)];
 		addAsteroid(nextAsteroidPosition(), nextSize);

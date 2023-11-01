@@ -7,6 +7,10 @@ static const int asteroidRandomAngle = static_cast<int>(30 * DEG2RAD);
 static const int asteroidCoolDown = 1.0f;
 static int lastAsteroidCreationTime = -1.0f;
 
+static const int maxAsteroids = 40;
+static const int speed = 110;
+static int asteroidCounter = 0;
+
 enum asSize
 {
 	Small = 1,
@@ -24,6 +28,10 @@ struct Asteroids
 	float creationTime;
 	Vector2 velocity;
 };
+
+
+Asteroids static asteroidsArray[maxAsteroids] = { 0 };
+static asSize asteroidSizes[] = { Small, Medium, Big };
 
 Asteroids createAsteroids(Vector2 position, Vector2 velocity, asSize SIZE);
 void asteroidsUpdate(Asteroids& asteroid);

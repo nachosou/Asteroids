@@ -1,10 +1,11 @@
 #include "pause.h"
 
-void drawPause(GameScenes& actualScene, Texture2D crosshair, Texture2D background, Texture2D menuUnselectedButton, Texture2D menuSelectedButton, Texture2D resumeUnselectedButton, Texture2D resumeSelectedButton, int screenHeight, int screenWidth, bool& isGamePaused)
+void drawPause(GameScenes& actualScene, Texture2D logo, Texture2D crosshair, Texture2D background, Texture2D menuUnselectedButton, Texture2D menuSelectedButton, Texture2D resumeUnselectedButton, Texture2D resumeSelectedButton, int screenHeight, int screenWidth, bool& isGamePaused)
 {
 	Vector2 posMouse = GetMousePosition();
 
 	DrawTexture(background, 0, 0, WHITE);
+	DrawTexture(logo, screenWidth / 2 - 200, 100, WHITE);
 
 	GameScenes menu = GameScenes::Menu;
 	GameScenes resume = GameScenes::Game;

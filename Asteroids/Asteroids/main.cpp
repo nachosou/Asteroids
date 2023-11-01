@@ -28,9 +28,11 @@ Texture2D credits;
 Texture2D harpoon;
 Texture2D crosshair;
 Texture2D rulesMenu;
+Texture2D logo;
 
 void gamePlay(Player& player, GameScenes& actualScene);
 void drawGamePlay(Player& player, Texture2D background, Texture2D harpoon);
+void resetStats(Player& player, Asteroids asteroidsArray[]);
 
 void main()
 {
@@ -53,6 +55,7 @@ void main()
     harpoon = LoadTexture("assets/arpon.png");
     crosshair = LoadTexture("assets/mira.png");
     rulesMenu = LoadTexture("assets/rules.png");
+    logo = LoadTexture("assets/logo.png");
     playUnselectedButton = LoadTexture("assets/playUnselectedButton.png");
     playSelectedButton = LoadTexture("assets/playSelectedButton.png");
     rulesUnselectedButton = LoadTexture("assets/rulesUnselectedButton.png");
@@ -74,7 +77,7 @@ void main()
         switch (actualScene)
         {
         case GameScenes::Menu:
-
+            resetStats(player, asteroidsArray);
             break;
 
         case GameScenes::Game:
@@ -112,7 +115,7 @@ void main()
         switch (actualScene)
         {
         case GameScenes::Menu:
-            drawMenu(actualScene, screenWidth, crosshair, playUnselectedButton, playSelectedButton, rulesUnselectedButton, rulesSelectedButton, exitUnselectedButton, exitSelectedButton, background, credits);
+            drawMenu(actualScene, screenWidth, logo, crosshair, playUnselectedButton, playSelectedButton, rulesUnselectedButton, rulesSelectedButton, exitUnselectedButton, exitSelectedButton, background, credits);
             break;
 
         case GameScenes::Game:
@@ -139,7 +142,7 @@ void main()
             break;
 
         case GameScenes::Pause:
-            drawPause(actualScene, crosshair, background, menuUnselectedButton, menuSelectedButton, resumeUnselectedButton, resumeSelectedButton, screenHeight, screenWidth, isGamePaused);
+            drawPause(actualScene, logo, crosshair, background, menuUnselectedButton, menuSelectedButton, resumeUnselectedButton, resumeSelectedButton, screenHeight, screenWidth, isGamePaused);
             break;
         }
 
@@ -168,5 +171,17 @@ void drawGamePlay(Player& player, Texture2D background, Texture2D harpoon)
     checkDrawBullets(player, harpoon);
     drawPlayer(player, WHITE, playerSpray, crosshair);
     drawAsteroidArray();
+}
+
+void resetStats(Player& player, Asteroids asteroidsArray[])
+{
+    player.pos.x = screenWidth / 2;
+    player.pos.y = screenHeight / 2;
+    player.velocity = { 0, 0 };
+
+    for (int i = 0; i < player.maxBullets; i++)
+    {
+        player.bulletsArray[i].isActive = false;
+    }
 }
 

@@ -4,7 +4,6 @@ Vector2 posMouse;
 float bulletAngle = 0.0f;
 Vector2 origin;
 
-
 void playerMovement(Player& player, int screenWidth, int screenHeight)
 {
     posMouse = GetMousePosition();
