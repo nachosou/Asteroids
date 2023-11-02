@@ -29,11 +29,10 @@ void playerMovement(Player& player, int screenWidth, int screenHeight, Sound sho
 	screenReflection(player, screenWidth, screenHeight);
 }
 
-void drawPlayer(Player player, Color color, Texture2D playerSpray, Texture2D crosshair)
+void drawPlayer(Player player, Color color, Texture2D playerSpray)
 {
 	bulletAngle = atan2(player.dir.y, player.dir.x) * RAD2DEG;
 
-	DrawTexture(crosshair, posMouse.x, posMouse.y, WHITE);
 	DrawTexturePro(playerSpray, { 0, 0, static_cast<float>(playerSpray.width), static_cast<float>(playerSpray.height) }, { player.pos.x, player.pos.y, static_cast<float>(playerSpray.width), static_cast<float>(playerSpray.height) }, { static_cast<float>(playerSpray.width / 2), static_cast<float>(playerSpray.height / 2) }, bulletAngle, WHITE);
 }
 

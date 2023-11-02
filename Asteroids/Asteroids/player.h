@@ -24,7 +24,7 @@ struct Player
 
 void playerMovement(Player& player, int screenWidth, int screenHeight, Sound shootingSound);
 
-void drawPlayer(Player player, Color color, Texture2D playerSpray, Texture2D crosshair);
+void drawPlayer(Player player, Color color, Texture2D playerSpray);
 
 void screenReflection(Player& player, int screenWidth, int screenHeight);
 

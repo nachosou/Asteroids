@@ -129,15 +129,11 @@ void runGame()
         case GameScenes::Menu:
         case GameScenes::Win:
         case GameScenes::Rules:
+        case GameScenes::Lose:
             StopMusicStream(gameMusic);
 
             PlayMusicStream(menuMusic);
             UpdateMusicStream(menuMusic);
-
-            resetStats(player, gameTimer);
-            break;
-
-        case GameScenes::Lose:
 
             resetStats(player, gameTimer);
             break;
@@ -229,12 +225,15 @@ void gamePlay(Player& player, GameScenes& actualScene, float gameTimer)
 
 void drawGamePlay(Player& player, Texture2D background, Texture2D harpoon)
 {
+    Vector2 posCrosshair = GetMousePosition();
+
     DrawTexture(background, 0, 0, WHITE);
     checkDrawBullets(player, harpoon);
-    drawPlayer(player, WHITE, playerSpray, crosshair);
+    drawPlayer(player, WHITE, playerSpray);
     drawAsteroidArray(asteroidsArray);
     checkGameCollisions(player, asteroidsArray, smallEnemy, mediumEnemy, bigEnemy, deathSound, dyingFish, asteroidCounter);
     DrawText(TextFormat("%01i", player.lifes), 20, 20, 40, WHITE);
+    DrawTexture(crosshair, posCrosshair.x, posCrosshair.y, WHITE);
 }
 
 void resetStats(Player& player, float& gameTimer)
