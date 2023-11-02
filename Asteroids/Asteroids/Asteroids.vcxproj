@@ -168,6 +168,7 @@ xcopy /s /e /y "$(SolutionDir)Asteroids/assets" "$(OutDir)assets"</Command>
     <ClCompile Include="pause.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="rules.cpp" />
+    <ClCompile Include="runGame.cpp" />
     <ClCompile Include="win.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -179,6 +180,7 @@ xcopy /s /e /y "$(SolutionDir)Asteroids/assets" "$(OutDir)assets"</Command>
     <ClInclude Include="player.h" />
     <ClInclude Include="buttons.h" />
     <ClInclude Include="rules.h" />
+    <ClInclude Include="runGame.h" />
     <ClInclude Include="scenes.h" />
     <ClInclude Include="win.h" />
   </ItemGroup>
