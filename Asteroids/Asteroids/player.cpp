@@ -4,7 +4,7 @@ Vector2 posMouse;
 float bulletAngle = 0.0f;
 Vector2 origin;
 
-void playerMovement(Player& player, int screenWidth, int screenHeight)
+void playerMovement(Player& player, int screenWidth, int screenHeight, Sound shootingSound)
 {
     posMouse = GetMousePosition();
 
@@ -22,6 +22,7 @@ void playerMovement(Player& player, int screenWidth, int screenHeight)
 
 	if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
 	{
+		PlaySound(shootingSound);
 		addBullet(player, Vector2Add(player.pos, player.dir));
 	}
 

@@ -41,11 +41,11 @@ Texture2D smallEnemy;
 Music menuMusic;
 Music gameMusic;
 
-Wave creditSound;
-Wave deathSound;
-Wave dyingFish;
-Wave shootingHarpoon;
-Wave touchingButtons;
+Sound creditSound;
+Sound deathSound;
+Sound dyingFish;
+Sound shootingSound;
+Sound touchingButtons;
 
 void gamePlay(Player& player, GameScenes& actualScene, float gameTimer);
 void drawGamePlay(Player& player, Texture2D background, Texture2D harpoon);
@@ -110,14 +110,20 @@ void main()
     menuMusic = LoadMusicStream("assets/menuMusic.wav");
     gameMusic = LoadMusicStream("assets/gameMusic.wav");
 
-    creditSound = LoadWave("assets/creditSound.wav");
-    deathSound = LoadWave("assets/deathSound.wav");
-    dyingFish = LoadWave("assets/dyingFish.wav");
-    shootingHarpoon = LoadWave("assets/shootingHarpoon.wav");
-    touchingButtons = LoadWave("assets/touchingButtons.wav");
+    creditSound = LoadSound("assets/creditsSound.wav");
+    deathSound = LoadSound("assets/deathSound.wav");
+    dyingFish = LoadSound("assets/dyingFish.wav");
+    shootingSound = LoadSound("assets/shootingHarpoon.wav");
+    touchingButtons = LoadSound("assets/touchingButtons.wav");
 
-    SetMusicVolume(menuMusic, 0.3);
-    SetMusicVolume(gameMusic, 0.3);
+    SetMusicVolume(menuMusic, 0.3f);
+    SetMusicVolume(gameMusic, 0.3f);
+
+    SetSoundVolume(creditSound, 0.7f);
+    SetSoundVolume(deathSound, 1.0f);
+    SetSoundVolume(dyingFish, 0.6f);
+    SetSoundVolume(shootingSound, 0.3f);
+    SetSoundVolume(touchingButtons, 1.0f);
 
     while (!WindowShouldClose() && !exitProgram)
     {
@@ -178,7 +184,7 @@ void main()
         switch (actualScene)
         {
         case GameScenes::Menu:
-            drawMenu(actualScene, screenWidth, logo, crosshair, playUnselectedButton, playSelectedButton, rulesUnselectedButton, rulesSelectedButton, exitUnselectedButton, exitSelectedButton, background, creditUnselectedButton, creditSelectedButton);
+            drawMenu(actualScene, screenWidth, logo, crosshair, playUnselectedButton, playSelectedButton, rulesUnselectedButton, rulesSelectedButton, exitUnselectedButton, exitSelectedButton, background, creditUnselectedButton, creditSelectedButton, touchingButtons, creditSound);
             break;
 
         case GameScenes::Game:
@@ -189,7 +195,7 @@ void main()
             break;
 
         case GameScenes::Rules:
-            drawRules(rulesMenu, menuUnselectedButton, menuSelectedButton, actualScene, crosshair);
+            drawRules(rulesMenu, menuUnselectedButton, menuSelectedButton, actualScene, crosshair, touchingButtons);
             break;
 
         case GameScenes::Exit:
@@ -197,15 +203,15 @@ void main()
             break;
 
         case GameScenes::Win:
-            drawWinScreen(actualScene, crosshair, win, menuUnselectedButton, menuSelectedButton, playUnselectedButton, playSelectedButton);
+            drawWinScreen(actualScene, crosshair, win, menuUnselectedButton, menuSelectedButton, playUnselectedButton, playSelectedButton, touchingButtons);
             break;
 
         case GameScenes::Lose:
-            drawLoseScreen(actualScene, crosshair, lose, menuUnselectedButton, menuSelectedButton, playUnselectedButton, playSelectedButton);
+            drawLoseScreen(actualScene, crosshair, lose, menuUnselectedButton, menuSelectedButton, playUnselectedButton, playSelectedButton, touchingButtons, deathSound);
             break;
 
         case GameScenes::Pause:
-            drawPause(actualScene, logo, crosshair, background, menuUnselectedButton, menuSelectedButton, resumeUnselectedButton, resumeSelectedButton, screenHeight, screenWidth, isGamePaused);
+            drawPause(actualScene, logo, crosshair, background, menuUnselectedButton, menuSelectedButton, resumeUnselectedButton, resumeSelectedButton, screenHeight, screenWidth, isGamePaused, touchingButtons);
             break;
         }
 
@@ -223,11 +229,11 @@ void gamePlay(Player& player, GameScenes& actualScene, float gameTimer)
         actualScene = GameScenes::Pause;
     }
 
-    playerMovement(player, screenWidth, screenHeight);
+    playerMovement(player, screenWidth, screenHeight, shootingSound);
     checkUpdateBullets(player);
     updateAsteroidArray(asteroidsArray);
     asteroidsCreation(asteroidsArray, smallEnemy, mediumEnemy, bigEnemy);
-    checkGameCollisions(player, asteroidsArray, smallEnemy, mediumEnemy, bigEnemy);
+    checkGameCollisions(player, asteroidsArray, smallEnemy, mediumEnemy, bigEnemy, deathSound, dyingFish);
     winOrLose(actualScene, player, gameTimer);
 }
 
@@ -237,7 +243,7 @@ void drawGamePlay(Player& player, Texture2D background, Texture2D harpoon)
     checkDrawBullets(player, harpoon);
     drawPlayer(player, WHITE, playerSpray, crosshair);
     drawAsteroidArray(asteroidsArray);
-    checkGameCollisions(player, asteroidsArray, smallEnemy, mediumEnemy, bigEnemy);
+    checkGameCollisions(player, asteroidsArray, smallEnemy, mediumEnemy, bigEnemy, deathSound, dyingFish);
 }
 
 void resetStats(Player& player, float& gameTimer)

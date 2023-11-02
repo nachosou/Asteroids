@@ -1,6 +1,6 @@
 #include "menu.h"
 
-void drawMenu(GameScenes& actualScene, int screenWidth, Texture2D logo, Texture2D crosshair, Texture2D playUnselectedButton, Texture2D playSelectedButton, Texture2D rulesUnselectedButton, Texture2D rulesSelectedButton, Texture2D exitUnselectedButton, Texture2D exitSelectedButton, Texture2D background, Texture2D creditUnselectedButton, Texture2D creditSelectedButton)
+void drawMenu(GameScenes& actualScene, int screenWidth, Texture2D logo, Texture2D crosshair, Texture2D playUnselectedButton, Texture2D playSelectedButton, Texture2D rulesUnselectedButton, Texture2D rulesSelectedButton, Texture2D exitUnselectedButton, Texture2D exitSelectedButton, Texture2D background, Texture2D creditUnselectedButton, Texture2D creditSelectedButton, Sound touchingButtons, Sound creditSound)
 {
 	Vector2 posMouse = GetMousePosition();
 
@@ -18,11 +18,11 @@ void drawMenu(GameScenes& actualScene, int screenWidth, Texture2D logo, Texture2
 	GameScenes rulesScene = GameScenes::Rules;
 	GameScenes exitScene = GameScenes::Exit;
 
-	buttons(actualScene, playScene, middleButtons, 300, width, height, playUnselectedButton, playSelectedButton);
+	buttons(actualScene, playScene, middleButtons, 300, width, height, playUnselectedButton, playSelectedButton, touchingButtons);
 
-	buttons(actualScene, rulesScene, middleButtons, 400, width, height, rulesUnselectedButton, rulesSelectedButton);
+	buttons(actualScene, rulesScene, middleButtons, 400, width, height, rulesUnselectedButton, rulesSelectedButton, touchingButtons);
 
-	buttons(actualScene, exitScene, middleButtons, 500, width, height, exitUnselectedButton, exitSelectedButton);
+	buttons(actualScene, exitScene, middleButtons, 500, width, height, exitUnselectedButton, exitSelectedButton, touchingButtons);
 
 	if (GetMouseX() >= xCredits
 		&& GetMouseX() <= xCredits + 394 
@@ -33,6 +33,7 @@ void drawMenu(GameScenes& actualScene, int screenWidth, Texture2D logo, Texture2
 		DrawTexture(creditSelectedButton, xCredits, yCredits, WHITE);
 		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
 		{
+			PlaySound(creditSound);
 			OpenURL("https://nachosou.itch.io");
 		}
 	}

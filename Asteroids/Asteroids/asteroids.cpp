@@ -157,13 +157,13 @@ bool cirCirCollision(float circle1x, float circle1y, float circle1r, float circl
 	return false;
 }
 
-void checkGameCollisions(Player& player, Asteroids asteroidsArray[], Texture2D smallEnemy, Texture2D mediumEnemy, Texture2D bigEnemy)
+void checkGameCollisions(Player& player, Asteroids asteroidsArray[], Texture2D smallEnemy, Texture2D mediumEnemy, Texture2D bigEnemy, Sound deathSound, Sound dyingFish)
 {
-	bulletAsteroidCollision(player, asteroidsArray, smallEnemy, mediumEnemy, bigEnemy);
-	asteroidPlayerCollision(player, asteroidsArray);
+	bulletAsteroidCollision(player, asteroidsArray, smallEnemy, mediumEnemy, bigEnemy, dyingFish);
+	asteroidPlayerCollision(player, asteroidsArray, deathSound);
 }
 
-void asteroidPlayerCollision(Player& player, Asteroids asteroidsArray[])
+void asteroidPlayerCollision(Player& player, Asteroids asteroidsArray[], Sound deathSound)
 {
 	for (int i = 0; i < maxAsteroids; i++)
 	{
@@ -171,6 +171,7 @@ void asteroidPlayerCollision(Player& player, Asteroids asteroidsArray[])
 
 		if (cirCirCollision(player.pos.x, player.pos.y, player.radius, asteroidsArray[i].pos.x, asteroidsArray[i].pos.y, asteroidsArray[i].radius))
 		{
+			PlaySound(deathSound);
 			player.lifes--;
 		}
 	}
@@ -216,7 +217,7 @@ void asteroidDivider(Asteroids& asteroid, Player& player, Asteroids asteroidsArr
 	}
 }
 
-void bulletAsteroidCollision(Player& player, Asteroids asteroidsArray[], Texture2D smallEnemy, Texture2D mediumEnemy, Texture2D bigEnemy)
+void bulletAsteroidCollision(Player& player, Asteroids asteroidsArray[], Texture2D smallEnemy, Texture2D mediumEnemy, Texture2D bigEnemy, Sound dyingFish)
 {
 	for (int i = 0; i < maxAsteroids; i++)
 	{
@@ -226,6 +227,7 @@ void bulletAsteroidCollision(Player& player, Asteroids asteroidsArray[], Texture
 
 			if (cirCirCollision(player.bulletsArray[j].pos.x, player.bulletsArray[j].pos.y, player.bulletsArray[j].radius, asteroidsArray[i].pos.x, asteroidsArray[i].pos.y, asteroidsArray[i].radius))
 			{
+				PlaySound(dyingFish);
 				asteroidDivider(asteroidsArray[i], player, asteroidsArray, smallEnemy, mediumEnemy, bigEnemy);
 				player.bulletsArray[j].isActive = false;
 			}

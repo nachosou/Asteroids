@@ -22,7 +22,7 @@ struct Player
 	float invulnerabilityTime = 1.2f;
 };
 
-void playerMovement(Player& player, int screenWidth, int screenHeight);
+void playerMovement(Player& player, int screenWidth, int screenHeight, Sound shootingSound);
 
 void drawPlayer(Player player, Color color, Texture2D playerSpray, Texture2D crosshair);
 
