@@ -54,6 +54,7 @@ void resetStats(Player& player, float& gameTimer);
 void winOrLose(GameScenes& actualScene, Player& player, float gameTimer);
 
 static Asteroids asteroidsArray[maxAsteroids];
+static int asteroidCounter = 0;
 
 void runGame()
 {
@@ -62,8 +63,6 @@ void runGame()
     player.pos.y = screenHeight / 2;
 
     float gameTimer = 0.0f;
-
-    int resetCounter = 0;
 
     GameScenes actualScene = GameScenes::Menu;
     bool newScene = true;
@@ -98,14 +97,6 @@ void runGame()
     resumeUnselectedButton = LoadTexture("assets/resumeUnselectedButton.png");
     resumeSelectedButton = LoadTexture("assets/resumeSelectedButton.png");
 
-    if (resetCounter < 1)
-    {
-        if (actualScene == GameScenes::Game)
-        {
-            resetCounter++;
-        }
-    }
-
     InitAudioDevice();
 
     menuMusic = LoadMusicStream("assets/menuMusic.wav");
@@ -137,7 +128,6 @@ void runGame()
         {
         case GameScenes::Menu:
         case GameScenes::Win:
-        case GameScenes::Lose:
         case GameScenes::Rules:
             StopMusicStream(gameMusic);
 
@@ -147,15 +137,14 @@ void runGame()
             resetStats(player, gameTimer);
             break;
 
+        case GameScenes::Lose:
+
+            resetStats(player, gameTimer);
+            break;
+
         case GameScenes::Game:
             if (!isGamePaused)
             {
-                if (resetCounter >= 1)
-                {
-                    asteroidsArray[0].isActive = true;
-                    resetCounter = 0;
-                }
-
                 StopMusicStream(menuMusic);
 
                 PlayMusicStream(gameMusic);
@@ -233,8 +222,8 @@ void gamePlay(Player& player, GameScenes& actualScene, float gameTimer)
     playerMovement(player, screenWidth, screenHeight, shootingSound);
     checkUpdateBullets(player);
     updateAsteroidArray(asteroidsArray);
-    asteroidsCreation(asteroidsArray, smallEnemy, mediumEnemy, bigEnemy);
-    checkGameCollisions(player, asteroidsArray, smallEnemy, mediumEnemy, bigEnemy, deathSound, dyingFish);
+    asteroidsCreation(asteroidsArray, smallEnemy, mediumEnemy, bigEnemy, asteroidCounter);
+    checkGameCollisions(player, asteroidsArray, smallEnemy, mediumEnemy, bigEnemy, deathSound, dyingFish, asteroidCounter);
     winOrLose(actualScene, player, gameTimer);
 }
 
@@ -244,7 +233,8 @@ void drawGamePlay(Player& player, Texture2D background, Texture2D harpoon)
     checkDrawBullets(player, harpoon);
     drawPlayer(player, WHITE, playerSpray, crosshair);
     drawAsteroidArray(asteroidsArray);
-    checkGameCollisions(player, asteroidsArray, smallEnemy, mediumEnemy, bigEnemy, deathSound, dyingFish);
+    checkGameCollisions(player, asteroidsArray, smallEnemy, mediumEnemy, bigEnemy, deathSound, dyingFish, asteroidCounter);
+    DrawText(TextFormat("%01i", player.lifes), 20, 20, 40, WHITE);
 }
 
 void resetStats(Player& player, float& gameTimer)
@@ -263,6 +253,8 @@ void resetStats(Player& player, float& gameTimer)
     {
         asteroidsArray[i].isActive = false;
     }
+
+    asteroidCounter = 0;
 
     gameTimer = 0.0f;
 }

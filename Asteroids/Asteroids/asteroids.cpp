@@ -9,7 +9,6 @@ Asteroids createAsteroids(Vector2 pos, Vector2 velocity, asSize SIZE, Texture2D 
 	asteroid.SIZE = SIZE;
 	asteroid.pos = pos;
 	asteroid.velocity = velocity;
-	asteroid.creationTime = static_cast<float>(GetTime());
 	if (asteroid.SIZE & Small)
 	{
 		asteroid.radius = 12;
@@ -51,7 +50,7 @@ void asteroidDraw(Asteroids asteroid)
 	DrawTexture(asteroid.texture, asteroid.pos.x - asteroid.radius, asteroid.pos.y - asteroid.radius, WHITE);
 }
 
-void addAsteroid(Vector2 pos, asSize SIZE, Vector2 secondAsteroidVelocity, bool isSpawned, Asteroids asteroidsArray[], Texture2D smallEnemy, Texture2D mediumEnemy, Texture2D bigEnemy)
+void addAsteroid(Vector2 pos, asSize SIZE, Vector2 secondAsteroidVelocity, bool isSpawned, Asteroids asteroidsArray[], Texture2D smallEnemy, Texture2D mediumEnemy, Texture2D bigEnemy, int& asteroidCounter)
 {
 	Vector2 screenCenter = { (GetScreenHeight() / 2),  (GetScreenWidth() / 2) };
 
@@ -90,12 +89,12 @@ void addAsteroid(Vector2 pos, asSize SIZE, Vector2 secondAsteroidVelocity, bool 
 	}
 }
 
-void asteroidsCreation(Asteroids asteroidsArray[], Texture2D smallEnemy, Texture2D mediumEnemy, Texture2D bigEnemy)
+void asteroidsCreation(Asteroids asteroidsArray[], Texture2D smallEnemy, Texture2D mediumEnemy, Texture2D bigEnemy, int& asteroidCounter)
 {
 	if (GetTime() > lastAsteroidCreationTime + asteroidCoolDown && asteroidCounter < maxAsteroids / 4)
 	{
 		asSize nextSize = asteroidSizes[GetRandomValue(0, 2)];
-		addAsteroid(nextAsteroidPosition(), nextSize, { 0, 0 }, true, asteroidsArray, smallEnemy, mediumEnemy, bigEnemy);
+		addAsteroid(nextAsteroidPosition(), nextSize, { 0, 0 }, true, asteroidsArray, smallEnemy, mediumEnemy, bigEnemy, asteroidCounter);
 		lastAsteroidCreationTime = (GetTime());
 	}
 }
@@ -157,10 +156,17 @@ bool cirCirCollision(float circle1x, float circle1y, float circle1r, float circl
 	return false;
 }
 
-void checkGameCollisions(Player& player, Asteroids asteroidsArray[], Texture2D smallEnemy, Texture2D mediumEnemy, Texture2D bigEnemy, Sound deathSound, Sound dyingFish)
+void checkGameCollisions(Player& player, Asteroids asteroidsArray[], Texture2D smallEnemy, Texture2D mediumEnemy, Texture2D bigEnemy, Sound deathSound, Sound dyingFish, int& asteroidCounter)
 {
-	bulletAsteroidCollision(player, asteroidsArray, smallEnemy, mediumEnemy, bigEnemy, dyingFish);
-	asteroidPlayerCollision(player, asteroidsArray, deathSound);
+	bulletAsteroidCollision(player, asteroidsArray, smallEnemy, mediumEnemy, bigEnemy, dyingFish, asteroidCounter);
+	if (player.invulnerabilityTime <= 0)
+	{
+		asteroidPlayerCollision(player, asteroidsArray, deathSound);
+	}
+	else
+	{
+		player.invulnerabilityTime -= GetFrameTime();
+	}
 }
 
 void asteroidPlayerCollision(Player& player, Asteroids asteroidsArray[], Sound deathSound)
@@ -173,6 +179,7 @@ void asteroidPlayerCollision(Player& player, Asteroids asteroidsArray[], Sound d
 		{
 			PlaySound(deathSound);
 			player.lifes--;
+			player.invulnerabilityTime = 1.2f;
 		}
 	}
 
@@ -182,7 +189,7 @@ void asteroidPlayerCollision(Player& player, Asteroids asteroidsArray[], Sound d
 	}
 }
 
-void asteroidDivider(Asteroids& asteroid, Player& player, Asteroids asteroidsArray[], Texture2D smallEnemy, Texture2D mediumEnemy, Texture2D bigEnemy)
+void asteroidDivider(Asteroids& asteroid, Player& player, Asteroids asteroidsArray[], Texture2D smallEnemy, Texture2D mediumEnemy, Texture2D bigEnemy, int& asteroidCounter)
 {
 	Vector2 screenCenter = { (GetScreenHeight() / 2),  (GetScreenWidth() / 2) };
 
@@ -201,13 +208,13 @@ void asteroidDivider(Asteroids& asteroid, Player& player, Asteroids asteroidsArr
 	switch (asteroid.SIZE)
 	{
 	case Big:
-		addAsteroid(asteroid.pos, Medium, newFirstAsteroidVelocity, false, asteroidsArray, smallEnemy, mediumEnemy, bigEnemy);
-		addAsteroid(asteroid.pos, Medium, newSecondAsteroidVelocity, false, asteroidsArray, smallEnemy, mediumEnemy, bigEnemy);
+		addAsteroid(asteroid.pos, Medium, newFirstAsteroidVelocity, false, asteroidsArray, smallEnemy, mediumEnemy, bigEnemy, asteroidCounter);
+		addAsteroid(asteroid.pos, Medium, newSecondAsteroidVelocity, false, asteroidsArray, smallEnemy, mediumEnemy, bigEnemy, asteroidCounter);
 		break;
 
 	case Medium:
-		addAsteroid(asteroid.pos, Small, newFirstAsteroidVelocity, false, asteroidsArray, smallEnemy, mediumEnemy, bigEnemy);
-		addAsteroid(asteroid.pos, Small, newSecondAsteroidVelocity, false, asteroidsArray, smallEnemy, mediumEnemy, bigEnemy);
+		addAsteroid(asteroid.pos, Small, newFirstAsteroidVelocity, false, asteroidsArray, smallEnemy, mediumEnemy, bigEnemy, asteroidCounter);
+		addAsteroid(asteroid.pos, Small, newSecondAsteroidVelocity, false, asteroidsArray, smallEnemy, mediumEnemy, bigEnemy, asteroidCounter);
 		break;
 
 	case Small:
@@ -217,7 +224,7 @@ void asteroidDivider(Asteroids& asteroid, Player& player, Asteroids asteroidsArr
 	}
 }
 
-void bulletAsteroidCollision(Player& player, Asteroids asteroidsArray[], Texture2D smallEnemy, Texture2D mediumEnemy, Texture2D bigEnemy, Sound dyingFish)
+void bulletAsteroidCollision(Player& player, Asteroids asteroidsArray[], Texture2D smallEnemy, Texture2D mediumEnemy, Texture2D bigEnemy, Sound dyingFish, int& asteroidCounter)
 {
 	for (int i = 0; i < maxAsteroids; i++)
 	{
@@ -228,7 +235,7 @@ void bulletAsteroidCollision(Player& player, Asteroids asteroidsArray[], Texture
 			if (cirCirCollision(player.bulletsArray[j].pos.x, player.bulletsArray[j].pos.y, player.bulletsArray[j].radius, asteroidsArray[i].pos.x, asteroidsArray[i].pos.y, asteroidsArray[i].radius))
 			{
 				PlaySound(dyingFish);
-				asteroidDivider(asteroidsArray[i], player, asteroidsArray, smallEnemy, mediumEnemy, bigEnemy);
+				asteroidDivider(asteroidsArray[i], player, asteroidsArray, smallEnemy, mediumEnemy, bigEnemy, asteroidCounter);
 				player.bulletsArray[j].isActive = false;
 			}
 		}
