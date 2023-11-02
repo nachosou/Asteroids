@@ -24,9 +24,10 @@ Texture2D menuUnselectedButton;
 Texture2D menuSelectedButton;
 Texture2D resumeUnselectedButton;
 Texture2D resumeSelectedButton;
+Texture2D creditUnselectedButton;
+Texture2D creditSelectedButton;
 Texture2D background;
 Texture2D playerSpray;
-Texture2D credits;
 Texture2D harpoon;
 Texture2D crosshair;
 Texture2D rulesMenu;
@@ -36,6 +37,15 @@ Texture2D lose;
 Texture2D bigEnemy;
 Texture2D mediumEnemy;
 Texture2D smallEnemy;
+
+Music menuMusic;
+Music gameMusic;
+
+Wave creditSound;
+Wave deathSound;
+Wave dyingFish;
+Wave shootingHarpoon;
+Wave touchingButtons;
 
 void gamePlay(Player& player, GameScenes& actualScene, float gameTimer);
 void drawGamePlay(Player& player, Texture2D background, Texture2D harpoon);
@@ -65,7 +75,6 @@ void main()
 
     background = LoadTexture("assets/background.png");
     playerSpray = LoadTexture("assets/buzo.png");
-    credits = LoadTexture("assets/creditos.png");
     harpoon = LoadTexture("assets/arpon.png");
     crosshair = LoadTexture("assets/mira.png");
     rulesMenu = LoadTexture("assets/rules.png");
@@ -75,6 +84,8 @@ void main()
     bigEnemy = LoadTexture("assets/bigEnemy.png");
     mediumEnemy = LoadTexture("assets/mediumEnemy.png");
     smallEnemy = LoadTexture("assets/smallEnemy.png");
+    creditUnselectedButton = LoadTexture("assets/creditUnselectedButton.png");
+    creditSelectedButton = LoadTexture("assets/creditSelectedButton.png");
     playUnselectedButton = LoadTexture("assets/playUnselectedButton.png");
     playSelectedButton = LoadTexture("assets/playSelectedButton.png");
     rulesUnselectedButton = LoadTexture("assets/rulesUnselectedButton.png");
@@ -93,7 +104,21 @@ void main()
             resetCounter++;
         }
     }
-    
+
+    InitAudioDevice();
+
+    menuMusic = LoadMusicStream("assets/menuMusic.wav");
+    gameMusic = LoadMusicStream("assets/gameMusic.wav");
+
+    creditSound = LoadWave("assets/creditSound.wav");
+    deathSound = LoadWave("assets/deathSound.wav");
+    dyingFish = LoadWave("assets/dyingFish.wav");
+    shootingHarpoon = LoadWave("assets/shootingHarpoon.wav");
+    touchingButtons = LoadWave("assets/touchingButtons.wav");
+
+    SetMusicVolume(menuMusic, 0.3);
+    SetMusicVolume(gameMusic, 0.3);
+
     while (!WindowShouldClose() && !exitProgram)
     {
         HideCursor();
@@ -106,6 +131,12 @@ void main()
         case GameScenes::Menu:
         case GameScenes::Win:
         case GameScenes::Lose:
+        case GameScenes::Rules:
+            StopMusicStream(gameMusic);
+
+            PlayMusicStream(menuMusic);         
+            UpdateMusicStream(menuMusic);
+
             resetStats(player, gameTimer);
             break;
 
@@ -118,13 +149,14 @@ void main()
                     resetCounter = 0;
                 }
 
+                StopMusicStream(menuMusic);
+
+                PlayMusicStream(gameMusic);
+                UpdateMusicStream(gameMusic);
+
                 gameTimer += GetFrameTime();
                 gamePlay(player, actualScene, gameTimer);
             }         
-            break;
-
-        case GameScenes::Rules:
-            
             break;
 
         case GameScenes::Exit:
@@ -132,7 +164,10 @@ void main()
             break;
 
         case GameScenes::Pause:
+            StopMusicStream(menuMusic);
 
+            PlayMusicStream(gameMusic);
+            UpdateMusicStream(gameMusic);
             break;
         }
 
@@ -143,7 +178,7 @@ void main()
         switch (actualScene)
         {
         case GameScenes::Menu:
-            drawMenu(actualScene, screenWidth, logo, crosshair, playUnselectedButton, playSelectedButton, rulesUnselectedButton, rulesSelectedButton, exitUnselectedButton, exitSelectedButton, background, credits);
+            drawMenu(actualScene, screenWidth, logo, crosshair, playUnselectedButton, playSelectedButton, rulesUnselectedButton, rulesSelectedButton, exitUnselectedButton, exitSelectedButton, background, creditUnselectedButton, creditSelectedButton);
             break;
 
         case GameScenes::Game:
@@ -177,6 +212,7 @@ void main()
         EndDrawing();
     }
 
+    CloseAudioDevice();
     CloseWindow();       
 }
 
@@ -236,5 +272,7 @@ void winOrLose(GameScenes& actualScene, Player& player, float gameTimer)
         actualScene = GameScenes::Win;
     }
 }
+
+
 
 
